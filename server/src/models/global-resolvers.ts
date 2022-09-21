@@ -1,7 +1,7 @@
 import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 
-export const globalResolvers = {
+export const globalResolver = {
   name: Type.String(),
   intents: Type.Record(
     Type.String(),
@@ -12,8 +12,8 @@ export const globalResolvers = {
   )
 }
 
-export const globalResolversSchemaObject = Type.Strict(
-  Type.Object(globalResolvers, { additionalProperties: false })
+export const globalResolverSchemaObject = Type.Strict(
+  Type.Object(globalResolver, { additionalProperties: false })
 )
 
-export type GlobalResolvers = Static<typeof globalResolversSchemaObject>
+export type GlobalResolver = Static<typeof globalResolverSchemaObject>

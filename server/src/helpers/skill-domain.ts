@@ -2,15 +2,14 @@ import fs from 'fs'
 import path from 'path'
 
 import type { ShortLanguageCode } from '@/helpers/lang'
-
-enum SkillBridges {
-  Python = 'python'
-}
+import type { SkillBridge } from '../models/skill'
+import type { SkillConfig } from '../models/skill-config'
+import type { GlobalEntity } from '../models/global-entities'
 
 interface Skill {
   name: string
   path: string
-  bridge: `${SkillBridges}`
+  bridge: SkillBridge
 }
 
 interface SkillDomain {
@@ -19,6 +18,10 @@ interface SkillDomain {
   skills: {
     [key: string]: Skill
   }
+}
+
+interface SkillConfigWithGlobalEntities extends Omit<SkillConfig, 'entities'> {
+  entities: Record<string, GlobalEntity>
 }
 
 const DOMAINS_DIR = path.join(process.cwd(), 'skills')
@@ -116,9 +119,18 @@ class SkillDomainHelper {
    * @param configFilePath Path of the skill config file
    * @param lang Language short code
    */
-  public getSkillConfig(configFilePath: string, lang: ShortLanguageCode) {
-    const sharedDataPath = path.join(process.cwd(), 'core/data', lang)
-    const configData = JSON.parse(fs.readFileSync(configFilePath, 'utf8'))
+  public getSkillConfig(
+    configFilePath: string,
+    lang: ShortLanguageCode
+  ): SkillConfigWithGlobalEntities {
+    const sharedDataPath = path.join(process.cwd(), 'core', 'data', lang)
+    const configData = JSON.parse(
+      fs.readFileSync(configFilePath, 'utf8')
+    ) as SkillConfig
+    const result: SkillConfigWithGlobalEntities = {
+      ...configData,
+      entities: {}
+    }
     const { entities } = configData
 
     // Load shared data entities if entity = 'xxx.json'
@@ -127,16 +139,22 @@ class SkillDomainHelper {
 
       entitiesKeys.forEach((entity) => {
         if (typeof entities[entity] === 'string') {
-          entities[entity] = JSON.parse(
-            fs.readFileSync(path.join(sharedDataPath, entities[entity]), 'utf8')
+          const entityFilePath = path.join(
+            sharedDataPath,
+            entities[entity] as string
           )
+          const entityRawData = fs.readFileSync(entityFilePath, {
+            encoding: 'utf8'
+          })
+          const entityData = JSON.parse(entityRawData) as GlobalEntity
+          result.entities[entity] = entityData
         }
       })
 
       configData.entities = entities
     }
 
-    return configData
+    return result
   }
 }
 

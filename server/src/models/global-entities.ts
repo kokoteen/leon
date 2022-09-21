@@ -1,7 +1,7 @@
 import type { Static } from '@sinclair/typebox'
 import { Type } from '@sinclair/typebox'
 
-export const globalEntities = {
+export const globalEntity = {
   options: Type.Record(
     Type.String(),
     Type.Object({
@@ -11,8 +11,8 @@ export const globalEntities = {
   )
 }
 
-export const globalEntitiesSchemaObject = Type.Strict(
-  Type.Object(globalEntities, { additionalProperties: false })
+export const globalEntitySchemaObject = Type.Strict(
+  Type.Object(globalEntity, { additionalProperties: false })
 )
 
-export type GlobalEntities = Static<typeof globalEntitiesSchemaObject>
+export type GlobalEntity = Static<typeof globalEntitySchemaObject>
