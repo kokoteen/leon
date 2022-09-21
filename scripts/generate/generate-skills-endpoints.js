@@ -2,10 +2,10 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 
-import log from '@/helpers/log'
+import { LOG } from '@/helpers/log'
 
 import { langs } from '@@/core/langs.json'
-import { getSkillDomains } from '@/helpers/skill-domain'
+import { SKILL_DOMAIN } from '@/helpers/skill-domain'
 
 dotenv.config()
 
@@ -30,7 +30,7 @@ export default () =>
     const lang = langs[process.env.LEON_HTTP_API_LANG].short
 
     try {
-      const skillDomains = await getSkillDomains()
+      const skillDomains = await SKILL_DOMAIN.getSkillDomains()
       const finalObj = {
         endpoints: []
       }
@@ -65,7 +65,7 @@ export default () =>
           }
 
           if (i + 1 === skillDomains.size) {
-            log.success(`${outputFile} is already up-to-date`)
+            LOG.success(`${outputFile} is already up-to-date`)
             isFileNeedToBeGenerated = false
           }
 
@@ -75,7 +75,7 @@ export default () =>
 
       // Force if a language is given
       if (isFileNeedToBeGenerated) {
-        log.info('Parsing skills configuration...')
+        LOG.info('Parsing skills configuration...')
 
         for (const currentDomain of skillDomains.values()) {
           const skillKeys = Object.keys(currentDomain.skills)
@@ -98,7 +98,7 @@ export default () =>
             for (let k = 0; k < actionsKeys.length; k += 1) {
               const action = actionsKeys[k]
               const actionObj = actions[action]
-              const { entities, http_api } = actionObj // eslint-disable-line camelcase
+              const { entities, http_api } = actionObj
               let finalMethod = entities || http_api?.entities ? 'POST' : 'GET'
 
               // Only generate this route if it is not disabled from the skill config
@@ -143,17 +143,17 @@ export default () =>
           }
         }
 
-        log.info(`Writing ${outputFile} file...`)
+        LOG.info(`Writing ${outputFile} file...`)
         try {
           fs.writeFileSync(outputFilePath, JSON.stringify(finalObj, null, 2))
-          log.success(`${outputFile} file generated`)
+          LOG.success(`${outputFile} file generated`)
           resolve()
         } catch (e) {
           reject(`Failed to generate ${outputFile} file: ${e.message}`)
         }
       }
     } catch (e) {
-      log.error(e.message)
+      LOG.error(e.message)
       reject(e)
     }
   })
