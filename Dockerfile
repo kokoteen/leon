@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 ENV IS_DOCKER true
 EXPOSE 1337
+EXPOSE 1342
 
 # Replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
