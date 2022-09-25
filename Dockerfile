@@ -66,4 +66,5 @@ COPY --chown=docker ./ ./
 RUN npm install
 RUN npm run build
 
+EXPOSE 1337
 CMD ["npm", "start"]
