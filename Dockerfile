@@ -1,5 +1,6 @@
 FROM ubuntu:latest
 ENV IS_DOCKER true
+EXPOSE 1337
 
 # Replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
@@ -66,5 +67,4 @@ COPY --chown=docker ./ ./
 RUN npm install
 RUN npm run build
 
-EXPOSE 1337
 CMD ["npm", "start"]
